@@ -1,0 +1,14 @@
+<configuration>
+	<property name="LOG_FORMAT" value="%date [%thread] %-5level %logger - %msg%n%rEx" />
+	<property name="CHARSET" value="UTF-8" />
+	<property name="LOG_DIR" value="logs" />
+
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder><pattern>${LOG_FORMAT}</pattern><charset>${CHARSET}</charset></encoder>
+	</appender>
+
+    <root level="info">
+		<appender-ref ref="stdout" />
+	</root>
+
+</configuration>
