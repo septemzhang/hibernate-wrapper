@@ -9,7 +9,7 @@ name := "hibernate-wrapper"
 
 version := "0.0.1"
 
-scalaVersion := "2.10.4"
+scalaVersion := "2.11.6"
 
 val jettyVersion = "9.2.4.v20141103"
 

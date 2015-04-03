@@ -38,7 +38,7 @@ object User {
 
   def findByName(name: String)(implicit session: Session) : User = {
     val hql = "from User where name = ?"
-    SessionWrapper(session).findUnique(hql, Vector(name))
+    SessionWrapper(session).findUnique(hql, name)
   }
 
   def get(id: java.lang.Long)(implicit session: Session) : User = SessionWrapper(session).get[User](id)

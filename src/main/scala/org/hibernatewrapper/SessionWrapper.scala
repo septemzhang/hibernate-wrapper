@@ -16,18 +16,18 @@ class SessionWrapper(val session: Session) {
   /**
    * find with hql and parameters
    */
-  def find[T](hql: String, params: Vector[Any] = Vector()): List[T] = {
-    createQuery(hql, params).list().asInstanceOf[List[T]]
+  def find[T](hql: String, params: Any*): List[T] = {
+    createQuery(hql, params: _*).list().asInstanceOf[List[T]]
   }
 
   /**
    * find unique result with hql and parameters
    */
-  def findUnique[T](hql: String, params: Vector[Any] = Vector()): T = {
-    createQuery(hql, params).uniqueResult().asInstanceOf[T]
+  def findUnique[T](hql: String, params: Any*): T = {
+    createQuery(hql, params: _*).uniqueResult().asInstanceOf[T]
   }
 
-  private def createQuery(queryString: String, values: Vector[Any]): Query = {
+  private def createQuery(queryString: String, values: Any*): Query = {
     require(queryString != null && !queryString.isEmpty, "queryString cannot be empty")
     val query: Query = session.createQuery(queryString)
     values.zipWithIndex.foreach {

@@ -82,11 +82,10 @@ class SessionFactoryWrapperSpec extends FunSpec {
       it("should create query with parameters") {
         val f = fixture
         val hql = "hql"
-        val params = Vector("v1", "v2")
         val query = mock(classOf[Query])
 
         when(f.session.createQuery(hql)).thenReturn(query)
-        SessionWrapper(f.session).find(hql, params)
+        SessionWrapper(f.session).find(hql, "v1", "v2")
         verify(query).setParameter(0, "v1")
         verify(query).setParameter(1, "v2")
         verify(query).list
