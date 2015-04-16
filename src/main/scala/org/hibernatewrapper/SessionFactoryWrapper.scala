@@ -12,9 +12,11 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
   private val logger = LoggerFactory.getLogger(classOf[SessionFactoryWrapper])
 
   /**
-   * apply function f to a new session in a transaction with given transaction attribute
-   * use loan pattern to deal with managing session and cross cutting concerns like transaction
-   * loan pattern is much more simpler than aop solution from java
+   * apply function f to a new session in a transaction with given transaction attribute.
+   *
+   * use loan pattern to deal with managing session and cross cutting concerns like transaction.
+   *
+   * loan pattern is much more simpler than aop solution from java.
    */
   def withTransaction[T](txAttr: TXAttr)(f: Session => T): T = {
     useSession { session =>
@@ -26,6 +28,24 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
    * apply function f to a new session with default transaction attribute
    */
   def withTransaction[T](f: Session => T): T = withTransaction(TXAttr())(f)
+
+  /**
+   * apply function f to a new session and rollback transaction.
+   * it is useful in unit test.
+   */
+  def rollback[T](f: Session => T): T = {
+    useSession { session =>
+      try {
+        val transaction = session.getTransaction
+        transaction.begin()
+        val result = f(session)
+        result
+      } finally {
+        session.clear()
+        session.getTransaction.rollback()
+      }
+    }
+  }
 
   /**
    * apply the given function f to a pre bound session with current executing thread
@@ -63,23 +83,19 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
       session.setFlushMode(if (txAttr.readOnly) FlushMode.MANUAL else FlushMode.AUTO)
       val transaction = session.getTransaction
       transaction.setTimeout(txAttr.timeout)
-      transaction.begin
+      transaction.begin()
       val result = f(session)
-      //TODO check rollback in catch clause
-      if(txAttr.rollback) {
-        session.clear
-        transaction.rollback
-      }
-      else transaction.commit
+      //TODO flush session before commit
+      transaction.commit()
       result
     } catch {
       case e: Throwable =>
         if (txAttr.shouldCommitOn(e)) {
           logger.info("commit for exception: {}", e.getMessage)
-          session.getTransaction.commit
+          session.getTransaction.commit()
         }else {
-          session.clear
-          session.getTransaction.rollback
+          session.clear()
+          session.getTransaction.rollback()
         }
         throw e
     }
@@ -100,15 +116,14 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
  * it will rollback for all exceptions by default
  * you can also specify no rollback rules, if you do not want a transaction rolled back when an exception is thrown
  */
-case class TXAttr(rollback: Boolean = false, readOnly: Boolean = false
-                  ,timeout: Int = -1 , private val commitOn: Set[Class[_]] = Set()) {
+case class TXAttr(readOnly: Boolean = false ,timeout: Int = -1
+                  , private val commitOn: Set[Class[_ <: Throwable]] = Set()) {
 
-  def rollback(value: Boolean) : TXAttr = copy(rollback = value)
   def readOnly(value: Boolean) : TXAttr = copy(readOnly = value)
   def timeout(seconds: Int) : TXAttr = copy(timeout = seconds)
 
   def shouldCommitOn(ex: Throwable) : Boolean = {
-    commitOn.exists(_.isAssignableFrom(ex.getClass));
+    commitOn.exists(_.isAssignableFrom(ex.getClass))
   }
 
 }

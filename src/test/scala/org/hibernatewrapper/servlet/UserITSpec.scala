@@ -1,6 +1,6 @@
 package org.hibernatewrapper.servlet
 
-import org.hibernatewrapper.{TXAttr, SessionFactoryWrapper}
+import org.hibernatewrapper.{SessionWrapper, TXAttr, SessionFactoryWrapper}
 import org.hibernatewrapper.fixture.SessionFactoryHolder
 import org.hibernatewrapper.scalatest.LongSessionSupport
 import org.hibernatewrapper.servlet.model.{Task, User}
@@ -11,13 +11,11 @@ class UserITSpec extends FunSpec with LongSessionSupport {
   val sessionFactory = SessionFactoryHolder.sessionFactory
   val sfw = new SessionFactoryWrapper(sessionFactory)
 
-  val rollback = TXAttr(rollback = true)
-
   describe("User") {
     it("should generate primary key after registration") {
       val user = createUser("primary key")
       assert(user.getId == null)
-      sfw.withTransaction(rollback) { implicit session =>
+      sfw.rollback { implicit session =>
         User.register(user)
       }
       assert(user.getId > 0)
@@ -47,7 +45,7 @@ class UserITSpec extends FunSpec with LongSessionSupport {
     }
 
     it("should load tasks for user in the same session") {
-      sfw.withTransaction(rollback) { implicit session =>
+      sfw.rollback { implicit session =>
         val user = createUser("load_user_and_task")
         User.register(user)
         val task = createTask
@@ -75,6 +73,23 @@ class UserITSpec extends FunSpec with LongSessionSupport {
       }
       //lazy load tasks
       assert(newUser.getTasks.size() === 1)
+    }
+
+    it("should rollback any change in rollback transaction") {
+      val name = "rollback_" + System.currentTimeMillis();
+      val user = sfw.rollback { implicit session =>
+        val user = createUser(name)
+        User.register(user)
+        user
+      }
+
+      assert(user.getId != null)
+
+      val count = sfw.withSession { session =>
+        SessionWrapper(session).findUnique[Long]("select count(*) from User where name = ?", name)
+      }
+
+      assert(count === 0)
     }
 
   }

@@ -42,7 +42,7 @@ class SessionFactoryWrapperSpec extends FunSpec {
       }
       it("should rollback with rollback attr") {
         val f = fixture
-        f.sfw.withTransaction(TXAttr().rollback(true)) { session => }
+        f.sfw.rollback { session => }
         verify(f.session).clear
         verify(f.transaction).rollback
       }

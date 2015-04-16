@@ -6,6 +6,7 @@ import org.hibernate.{Query, Session}
 
 class SessionWrapper(val session: Session) {
 
+  //TODO make type of id a type parameter
   def get[T](id: java.lang.Long)(implicit m: Manifest[T]) : T = session.get(m.runtimeClass, id).asInstanceOf[T]
 
   /**
