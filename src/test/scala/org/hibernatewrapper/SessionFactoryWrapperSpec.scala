@@ -60,7 +60,7 @@ class SessionFactoryWrapperSpec extends FunSpec {
       it("should commit for exception specified in attr") {
         val f = fixture
         intercept[NullPointerException] {
-          f.sfw.withTransaction(TXAttr().commitOn(classOf[NullPointerException])) {
+          f.sfw.withTransaction(TXAttr(commitOn = Set(classOf[NullPointerException]))) {
             session => throw new NullPointerException
           }
         }

@@ -18,17 +18,11 @@ class TXAttrSpec extends FunSpec {
       assertRollbackOn(attr, new IllegalStateException, new RuntimeException)
     }
 
-    it("should commit on specific exceptions after copy") {
-      val attr = TXAttr().commitOn(classOf[NullPointerException], classOf[IllegalArgumentException])
-      assertCommitOn(attr, new NullPointerException, new IllegalArgumentException)
-      assertRollbackOn(attr, new IllegalStateException, new RuntimeException, new Exception)
-    }
-
-    it("should commit on checked exceptions and rollback on runtime exceptions") {
-      val attr = TXAttr(commitOn = Set(classOf[Exception]))
-      assertCommitOn(attr, new FileNotFoundException, new Exception)
-      assertRollbackOn(attr, new IllegalStateException, new RuntimeException)
-    }
+//    it("should commit on checked exceptions and rollback on runtime exceptions") {
+//      val attr = TXAttr(commitOn = Set(classOf[Exception]))
+//      assertCommitOn(attr, new FileNotFoundException, new Exception)
+//      assertRollbackOn(attr, new IllegalStateException, new RuntimeException)
+//    }
 
   }
 
