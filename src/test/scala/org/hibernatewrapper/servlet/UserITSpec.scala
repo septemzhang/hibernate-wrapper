@@ -21,29 +21,6 @@ class UserITSpec extends FunSpec with LongSessionSupport {
       assert(user.getId > 0)
     }
 
-    it("should work for updating after readonly transaction in the pre-bound session") {
-      val user = createUser("update")
-      sfw.withSession { implicit session =>
-        User.register(user)
-      }
-
-      def getName = sfw.withCurrentSession(TXAttr(readOnly = true)) { implicit session =>
-        User.get(user.getId).getName
-      }
-      //get user with readonly transaction
-      assert(getName === user.getName)
-
-      val newName = "new_name"
-      //then update user with same pre-bound session
-      sfw.withCurrentSession {implicit session =>
-        val u = User.get(user.getId)
-        u.setName(newName)
-        session.save(u)
-      }
-
-      assert(getName === newName)
-    }
-
     it("should load tasks for user in the same session") {
       sfw.rollback { implicit session =>
         val user = createUser("load_user_and_task")
@@ -90,6 +67,21 @@ class UserITSpec extends FunSpec with LongSessionSupport {
       }
 
       assert(count === 0)
+    }
+
+    it("dirty check of session can not cover operations executed by query") {
+      val user = sfw.withTransaction { implicit session =>
+        val user = new User
+        user.setName("dirty_check_" + System.currentTimeMillis())
+        User.register(user)
+        user
+      }
+
+      sfw.withSession { session =>
+        val count = session.createQuery(s"delete User where id = ${user.getId}").executeUpdate()
+        assert(count === 1)
+        assert(!session.isDirty)
+      }
     }
 
   }

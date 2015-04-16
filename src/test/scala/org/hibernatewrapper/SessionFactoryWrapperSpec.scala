@@ -27,7 +27,6 @@ class SessionFactoryWrapperSpec extends FunSpec {
         val f = fixture
         f.sfw.withTransaction { session => }
         verify(f.session).getTransaction
-        verify(f.session).setFlushMode(FlushMode.AUTO)
         verify(f.transaction).begin
         verify(f.transaction).setTimeout(-1)
         verify(f.transaction).commit
@@ -45,11 +44,6 @@ class SessionFactoryWrapperSpec extends FunSpec {
         f.sfw.rollback { session => }
         verify(f.session).clear
         verify(f.transaction).rollback
-      }
-      it("should flush manually with readonly attr") {
-        val f = fixture
-        f.sfw.withTransaction(TXAttr().readOnly(true)) { session => }
-        verify(f.session).setFlushMode(FlushMode.MANUAL)
       }
       it("should set timeout with timeout attr") {
         val f = fixture

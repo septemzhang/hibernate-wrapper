@@ -79,13 +79,11 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
 
   private def inTransaction[T](txAttr: TXAttr, session: Session)(f: Session => T): T = {
     try {
-      //TODO restore flush mode after transaction complete?
-      session.setFlushMode(if (txAttr.readOnly) FlushMode.MANUAL else FlushMode.AUTO)
       val transaction = session.getTransaction
       transaction.setTimeout(txAttr.timeout)
       transaction.begin()
       val result = f(session)
-      //TODO flush session before commit
+      //TODO flush session before commit?
       transaction.commit()
       result
     } catch {
@@ -116,10 +114,8 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
  * it will rollback for all exceptions by default
  * you can also specify no rollback rules, if you do not want a transaction rolled back when an exception is thrown
  */
-case class TXAttr(readOnly: Boolean = false ,timeout: Int = -1
-                  , private val commitOn: Set[Class[_ <: Throwable]] = Set()) {
+case class TXAttr(timeout: Int = -1, private val commitOn: Set[Class[_ <: Throwable]] = Set()) {
 
-  def readOnly(value: Boolean) : TXAttr = copy(readOnly = value)
   def timeout(seconds: Int) : TXAttr = copy(timeout = seconds)
 
   def shouldCommitOn(ex: Throwable) : Boolean = {
