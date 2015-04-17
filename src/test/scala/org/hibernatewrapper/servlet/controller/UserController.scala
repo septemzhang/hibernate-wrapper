@@ -13,7 +13,7 @@ class UserController extends HttpServlet {
 
   override def doGet(req: HttpServletRequest, resp: HttpServletResponse): Unit = {
     val id = registerUser.getId
-    val user = sfw.withCurrentSession { implicit session =>
+    val user = sfw.withTransaction{ implicit session =>
       User.get(id)
     }
 

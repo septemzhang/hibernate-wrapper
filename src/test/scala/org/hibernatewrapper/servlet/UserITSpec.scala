@@ -1,6 +1,6 @@
 package org.hibernatewrapper.servlet
 
-import org.hibernatewrapper.{SessionWrapper, TXAttr, SessionFactoryWrapper}
+import org.hibernatewrapper.{SessionWrapper, SessionFactoryWrapper}
 import org.hibernatewrapper.fixture.SessionFactoryHolder
 import org.hibernatewrapper.scalatest.LongSessionSupport
 import org.hibernatewrapper.servlet.model.{Task, User}
@@ -39,7 +39,7 @@ class UserITSpec extends FunSpec with LongSessionSupport {
     }
 
     it("should load tasks lazily in the pre-bound session") {
-      val newUser: User = sfw.withCurrentSession { implicit session =>
+      val newUser: User = sfw.withTransaction{ implicit session =>
         val user = createUser("lazy_load")
         User.register(user)
         val task = createTask

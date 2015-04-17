@@ -31,7 +31,7 @@ class SessionFactoryWrapperSpec extends FunSpec {
         verify(f.transaction).setTimeout(-1)
         verify(f.transaction).commit
       }
-      it("should rollback and clear session when exception raised") {
+      it("should rollback by default when exception raised") {
         val f = fixture
         intercept[RuntimeException] {
           f.sfw.withTransaction { session => throw new RuntimeException }
@@ -39,7 +39,16 @@ class SessionFactoryWrapperSpec extends FunSpec {
         verify(f.session).clear
         verify(f.transaction).rollback
       }
-      it("should rollback with rollback attr") {
+      it("should commit transaction for specific exception") {
+        val f = fixture
+        intercept[NullPointerException] {
+          f.sfw.withTransaction(commitOn = Set(classOf[NullPointerException]), timeout = 1) { session =>
+            throw new NullPointerException
+          }
+        }
+        verify(f.transaction).commit()
+      }
+      it("should rollback in rollback transaction") {
         val f = fixture
         f.sfw.rollback { session => }
         verify(f.session).clear
@@ -48,29 +57,40 @@ class SessionFactoryWrapperSpec extends FunSpec {
       it("should set timeout with timeout attr") {
         val f = fixture
         val timeout = 1
-        f.sfw.withTransaction(TXAttr().timeout(timeout)) { session => }
+        f.sfw.withTransaction(timeout = timeout) { session => }
         verify(f.transaction).setTimeout(timeout)
       }
-      it("should commit for exception specified in attr") {
+      it("should commit for specified exception") {
         val f = fixture
-        intercept[NullPointerException] {
-          f.sfw.withTransaction(TXAttr(commitOn = Set(classOf[NullPointerException]))) {
-            session => throw new NullPointerException
-          }
-        }
-        verify(f.transaction).commit
+        assert(fixture.sfw.shouldCommitOn(new NullPointerException, Set(classOf[NullPointerException])))
+        assert(!fixture.sfw.shouldCommitOn(new IllegalStateException, Set(classOf[NullPointerException])))
       }
+      it("should rollback on all exceptions by default") {
+        List(new Throwable, new Exception, new RuntimeException, new NullPointerException).foreach { e =>
+          assert(!fixture.sfw.shouldCommitOn(e, Set()))
+        }
+      }
+      it("should compile for default parameters") {
+        val f = fixture
+        val swf = f.sfw
+        swf.withTransaction(Set(classOf[RuntimeException]), 1) { session => }
+        //        swf.withTransaction(commitOn = Set(classOf[RuntimeException])) { session => }
+        //        swf.withTransaction(1) { session => }
+        swf.withTransaction(timeout = 1) { session => }
+        swf.withTransaction { session => }
+      }
+
     }
 
-    describe("withCurrentSession") {
-      it("should start a new transaction") {
-        val f = fixture
-        f.sfw.withCurrentSession { session => }
-        verify(f.sf).getCurrentSession
-        verify(f.sf, never()).openSession()
-        verify(f.transaction).begin()
-      }
-    }
+//    describe("withCurrentSession") {
+//      it("should start a new transaction") {
+//        val f = fixture
+//        f.sfw.withCurrentSession { session => }
+//        verify(f.sf).getCurrentSession
+//        verify(f.sf, never()).openSession()
+//        verify(f.transaction).begin()
+//      }
+//    }
 
     describe("find") {
       it("should create query with parameters") {
@@ -104,6 +124,7 @@ class SessionFactoryWrapperSpec extends FunSpec {
         verify(f.session).get(classOf[Object], 1L)
       }
     }
+
   }
 
   def fixture = new {
