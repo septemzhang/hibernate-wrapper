@@ -14,7 +14,7 @@ here is some examples:
 
     //all the operations in the high order function will be run in transaction
     //SessionFactoryWrapper wil take care of opening/closing session and starting/committing transaction
-    val taskCount = sfw.withTransaction { session =>
+    val taskCount = sfw.withTransaction() { session =>
       val user = new User
       user.setName("new_user")
       session.save(user)
@@ -52,7 +52,7 @@ or you can implement all the database operations in a Rich Domain Model style:
 
     }
 
-    val taskCount = sfw.withTransaction{ implicit session =>
+    val taskCount = sfw.withTransaction() { implicit session =>
       val user = new User
       user.setName("new_user")
       User.register(user)
@@ -66,16 +66,16 @@ or you can implement all the database operations in a Rich Domain Model style:
 
 `withTransaction` will rollback for all exceptions by default. you can specify no rollback rules, if you do not want a transaction rolled back when an exception is thrown
 
-  //rollback on all exceptions except FileNotFoundException and NullPointerException
-  sfw.withTransaction(commitOn = Set(classOf[FileNotFoundException], classOf[NullPointerException])) { session =>
-    throw new FileNotFoundException()
-  }
+    //rollback on all exceptions except FileNotFoundException and NullPointerException
+    sfw.withTransaction(commitOn = Set(classOf[FileNotFoundException], classOf[NullPointerException])) { session =>
+      throw new FileNotFoundException()
+    }
 
 and set timeout by:
 
     sfw.withTransaction(commitOn = Set(classOf[FileNotFoundException]), timeout = 3) { session => }
 
-partial applied function:
+and reuse transaction attributes with partially applied function:
 
     def withDefaultTransaction[T] = sfw.withTransaction[T](Set(classOf[RuntimeException]), 3)(_ : Session => T)
 
@@ -90,5 +90,4 @@ partial applied function:
 
 * support pre-bound session and provide a consistent api with new created session
 * add scala implict conversion to extends SessionFactory and Session
-
 
