@@ -27,9 +27,10 @@ class SessionFactoryWrapperSpec extends FunSpec {
         val f = fixture
         f.sfw.withTransaction { session => }
         verify(f.session).getTransaction
-        verify(f.transaction).begin
+        verify(f.transaction).begin()
         verify(f.transaction).setTimeout(-1)
-        verify(f.transaction).commit
+        verify(f.session).flush()
+        verify(f.transaction).commit()
       }
       it("should rollback by default when exception raised") {
         val f = fixture
@@ -46,6 +47,7 @@ class SessionFactoryWrapperSpec extends FunSpec {
             throw new NullPointerException
           }
         }
+        verify(f.session).flush()
         verify(f.transaction).commit()
       }
       it("should rollback in rollback transaction") {

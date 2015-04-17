@@ -84,17 +84,15 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
       transaction.setTimeout(timeout)
       transaction.begin()
       val result = f(session)
-      //TODO flush session before commit?
-      transaction.commit()
+      commitTransaction(session)
       result
     } catch {
       case e: Throwable =>
         if (shouldCommitOn(e, commitOn)) {
           logger.info("commit for exception: {}", e.getMessage)
-          session.getTransaction.commit()
+          commitTransaction(session)
         }else {
-          session.clear()
-          session.getTransaction.rollback()
+          rollbackTransaction(session)
         }
         throw e
     }
@@ -121,8 +119,7 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
         val result = f(session)
         result
       } finally {
-        session.clear()
-        session.getTransaction.rollback()
+        rollbackTransaction(session)
       }
     }
   }
@@ -141,6 +138,16 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
    */
 //  def withCurrentSession[T](f: Session => T): T = withCurrentSession(TXAttr())(f)
 
+  private def rollbackTransaction(session: Session): Unit = {
+    session.clear()
+    session.getTransaction.rollback()
+  }
+
+  private def commitTransaction(session: Session): Unit = {
+    session.flush()
+    session.getTransaction.commit()
+  }
+
   /**
    * apply function f in a non-transactional session
    * it is recommended to use withCurrentSession which executes in a transaction
@@ -155,6 +162,8 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
       session.close()
     }
   }
+
+  private def getCurrentSession =  sessionFactory.getCurrentSession
 
   def bindSession(session: Session) =  ThreadLocalSessionContext.bind(session)
 
