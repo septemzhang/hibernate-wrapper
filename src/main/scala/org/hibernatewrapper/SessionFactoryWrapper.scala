@@ -48,11 +48,11 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
 //    }
 //  }
 
-  def withTransaction[T](f: Session => T): T = {
-    withTransaction(Set(), -1)(f)
-  }
+//  def withTransaction[T](f: Session => T): T = {
+//    withTransaction(Set(), -1)(f)
+//  }
 
-//  def withTransaction[T](commitOn: Set[ExceptionClass] = Set())(f: Session => T): T = {
+//  def withTransaction[T](commitOn: Set[ExceptionClass])(f: Session => T): T = {
 //    withTransaction(commitOn, -1)(f)
 //  }
 

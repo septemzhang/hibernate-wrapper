@@ -4,6 +4,9 @@ import java.util.List
 
 import org.hibernate.{Query, Session}
 
+/**
+ * some convenient functions to load/query entities from session
+ */
 class SessionWrapper(val session: Session) {
 
   //TODO make type of id a type parameter

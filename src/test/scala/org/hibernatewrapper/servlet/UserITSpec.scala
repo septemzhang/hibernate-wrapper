@@ -72,7 +72,7 @@ class UserITSpec extends FunSpec {
     }
 
     it("dirty check of session can not cover operations executed by query") {
-      val user = sfw.withTransaction { implicit session =>
+      val user = sfw.withTransaction() { implicit session =>
         val user = new User
         user.setName("dirty_check_" + System.currentTimeMillis())
         User.register(user)

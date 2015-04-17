@@ -50,4 +50,8 @@ object User {
     User
   }
 
+  def countTask(id: java.lang.Long)(implicit session: Session) : Long = {
+    SessionWrapper(session).findUnique[Long]("select count(id) from Task where user.id = ?", id)
+  }
+
 }

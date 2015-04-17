@@ -19,13 +19,13 @@ class SessionFactoryWrapperSpec extends FunSpec {
     describe("withTransaction") {
       it("should open and close session") {
         val f = fixture
-        f.sfw.withTransaction { session => }
+        f.sfw.withTransaction() { session => }
         verify(f.sf).openSession
         verify(f.session).close
       }
       it("should begin and commit transaction") {
         val f = fixture
-        f.sfw.withTransaction { session => }
+        f.sfw.withTransaction() { session => }
         verify(f.transaction).begin()
         verify(f.transaction).setTimeout(-1)
         verify(f.session).flush()
@@ -34,7 +34,7 @@ class SessionFactoryWrapperSpec extends FunSpec {
       it("should rollback by default when exception raised") {
         val f = fixture
         intercept[RuntimeException] {
-          f.sfw.withTransaction { session => throw new RuntimeException }
+          f.sfw.withTransaction() { session => throw new RuntimeException }
         }
         verify(f.session).clear
         verify(f.transaction).rollback
@@ -78,7 +78,7 @@ class SessionFactoryWrapperSpec extends FunSpec {
         //        swf.withTransaction(commitOn = Set(classOf[RuntimeException])) { session => }
         //        swf.withTransaction(1) { session => }
         swf.withTransaction(timeout = 1) { session => }
-        swf.withTransaction { session => }
+        swf.withTransaction() { session => }
       }
 
     }
