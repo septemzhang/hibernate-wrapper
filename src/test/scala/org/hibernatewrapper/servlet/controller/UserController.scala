@@ -3,6 +3,7 @@ package org.hibernatewrapper.servlet.controller
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 
 import org.eclipse.jetty.http.HttpStatus
+import org.hibernate.Hibernate
 import org.hibernatewrapper.SessionFactoryWrapper
 import org.hibernatewrapper.fixture.SessionFactoryHolder
 import org.hibernatewrapper.servlet.model.{Task, User}
@@ -14,11 +15,14 @@ class UserController extends HttpServlet {
   override def doGet(req: HttpServletRequest, resp: HttpServletResponse): Unit = {
     val id = registerUser.getId
     val user = sfw.withTransaction{ implicit session =>
-      User.get(id)
+      val u = User.get(id)
+      Hibernate.initialize(u)
+      Hibernate.initialize(u.getTasks)
+      u
     }
 
-    //should lazy load tasks in the pre-bound session
-    println(s"user: ${user.getName}, with task: ${user.getTasks.get(0).getName}")
+    //TODO should lazy load tasks in the pre-bound session
+//    println(s"user: ${user.getName}, with task: ${user.getTasks.get(0).getName}")
     resp.setStatus(HttpStatus.OK_200)
   }
 

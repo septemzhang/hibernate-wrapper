@@ -7,7 +7,6 @@ import org.h2.jdbcx.JdbcConnectionPool
 import org.hibernate.cfg.AvailableSettings._
 import org.hibernate.cfg.ImprovedNamingStrategy
 import org.hibernate.dialect.H2Dialect
-import org.hibernatewrapper.SessionFactoryBuilder
 import org.hibernatewrapper.servlet.model.{Task, User}
 
 object SessionFactoryHolder {
@@ -20,7 +19,7 @@ object SessionFactoryHolder {
   lazy val sessionFactory =
     SessionFactoryBuilder.dataSource(dataSource)
       .dialect(classOf[H2Dialect])
-      .namingStrategy(ImprovedNamingStrategy.INSTANCE)
+//      .namingStrategy(ImprovedNamingStrategy.INSTANCE)
       .annotatedClasses(classOf[User], classOf[Task]).props(p).build()
 
   def dataSource: DataSource = {

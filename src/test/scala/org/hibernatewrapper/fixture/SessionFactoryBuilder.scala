@@ -1,4 +1,4 @@
-package org.hibernatewrapper
+package org.hibernatewrapper.fixture
 
 import java.util.Properties
 import javax.sql.DataSource
@@ -35,10 +35,10 @@ object SessionFactoryBuilder {
   //    this
   //  }
 
-  def namingStrategy(strategy: NamingStrategy) = {
-    config.setNamingStrategy(strategy)
-    this
-  }
+//  def namingStrategy(strategy: NamingStrategy) = {
+//    config.setNamingStrategy(strategy)
+//    this
+//  }
 
   def typeOverride(userType: UserType, keys: Array[String]) = {
     config.registerTypeOverride(userType, keys)

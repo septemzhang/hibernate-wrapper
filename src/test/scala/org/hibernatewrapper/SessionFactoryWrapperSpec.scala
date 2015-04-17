@@ -26,7 +26,6 @@ class SessionFactoryWrapperSpec extends FunSpec {
       it("should begin and commit transaction") {
         val f = fixture
         f.sfw.withTransaction { session => }
-        verify(f.session).getTransaction
         verify(f.transaction).begin()
         verify(f.transaction).setTimeout(-1)
         verify(f.session).flush()

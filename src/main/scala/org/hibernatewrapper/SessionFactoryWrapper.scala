@@ -1,6 +1,5 @@
 package org.hibernatewrapper
 
-import org.hibernate.context.internal.ThreadLocalSessionContext
 import org.hibernate.{Session, SessionFactory}
 import org.slf4j.LoggerFactory
 
@@ -98,6 +97,9 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
     }
   }
 
+  /**
+   * visible for test
+   */
   def shouldCommitOn(e: Throwable, commitOn: Set[ExceptionClass]) : Boolean = {
     commitOn.exists(_.isAssignableFrom(e.getClass))
   }
@@ -150,7 +152,7 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
 
   /**
    * apply function f in a non-transactional session
-   * it is recommended to use withCurrentSession which executes in a transaction
+   * it is recommended to use withTransaction which executes in a transaction
    */
   def withSession[T](f: Session => T) : T = useSession(f)
 
@@ -163,15 +165,15 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
     }
   }
 
-  private def getCurrentSession =  sessionFactory.getCurrentSession
-
+  //TODO add in next version
+  /*
   def bindSession(session: Session) =  ThreadLocalSessionContext.bind(session)
 
-  //TODO remove param
-  def unbindSession(sessionFactory: SessionFactory) =  {
+  def unbindSession() =  {
     val session = ThreadLocalSessionContext.unbind(sessionFactory)
     if (session != null) session.close()
   }
+  */
 
 }
 
