@@ -9,6 +9,7 @@ it delivers the following benefits:
 
 here is some examples:
 
+```scala
     val sessionFactory = ... //build hibernate session factory
     val sfw = new SessionFactoryWrapper(sessionFactory)
 
@@ -28,9 +29,11 @@ here is some examples:
       //SessionWrapper provides some convenient functions to load/query entities 
       SessionWrapper(session).findUnique[Long]("select count(id) from Task where user = ?", user)
     }
+```
 
 or you can implement all the database operations in a Rich Domain Model style:
 
+```scala
     //Rich Domain Model
     object User {
 
@@ -63,20 +66,26 @@ or you can implement all the database operations in a Rich Domain Model style:
       User.saveTask(user, task)
       User.countTask(user.getId)
     }
+```
 
 `withTransaction` will rollback for all exceptions by default. you can specify no rollback rules, if you do not want a transaction rolled back when an exception is thrown
 
+```scala
     //rollback on all exceptions except FileNotFoundException and NullPointerException
     sfw.withTransaction(commitOn = Set(classOf[FileNotFoundException], classOf[NullPointerException])) { session =>
       throw new FileNotFoundException()
     }
+```
 
 and set timeout by:
 
+```scala
     sfw.withTransaction(commitOn = Set(classOf[FileNotFoundException]), timeout = 3) { session => }
+```
 
 and reuse transaction attributes with partially applied function:
 
+```scala
     def withDefaultTransaction[T] = sfw.withTransaction[T](Set(classOf[RuntimeException]), 3)(_ : Session => T)
 
     withDefaultTransaction { session =>
@@ -85,6 +94,7 @@ and reuse transaction attributes with partially applied function:
 
     //reuse default transaction
     withDefaultTransaction { session => }
+```
 
 #TODO
 
