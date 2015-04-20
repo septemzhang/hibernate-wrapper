@@ -7,9 +7,13 @@ it delivers the following benefits:
 * transaction/session management via high order function and loan pattern 
 * some convenient functions to load/query entities from session
 
+#transaction/session manager
+
 here is some examples:
 
 ```scala
+    import org.hibernatewrapper.{SessionFactoryWrapper, SessionWrapper}
+
     val sessionFactory = ... //build hibernate session factory
     val sfw = new SessionFactoryWrapper(sessionFactory)
 
@@ -34,6 +38,7 @@ here is some examples:
 or you can implement all the database operations in a Rich Domain Model style:
 
 ```scala
+
     //Rich Domain Model
     object User {
 
@@ -96,8 +101,36 @@ and reuse transaction attributes with partially applied function:
     withDefaultTransaction { session => }
 ```
 
+#Pre-bound session support
+
+Pre-bound session, aka `Open Session in View Pattern` is a pattern that binds a Hibernate Session to the thread of the request to allow for lazy loading in web views.
+
+to add get pre-bound session support, you first need to add `OpenSessionInViewFilter`to your servlet deployment descriptor, take jetty as example:
+
+```scala
+    import org.hibernatewrapper.{PreBoundSession, SessionFactoryWrapper}
+    import org.hibernatewrapper.servlet.OpenSessionInViewFilter
+
+    val sessionFactory = ...
+
+    //jetty servlet handler
+    val handler = new ServletHandler
+    handler.addFilterWithMapping(new FilterHolder(new OpenSessionInViewFilter(sf)), "/*", FilterMapping.ALL)
+```
+
+and then mixin `PreBoundSession` for SessionFactoryWrapper:
+
+```scala
+    import org.hibernatewrapper.{PreBoundSession, SessionFactoryWrapper}
+
+    val sessionFactory = ...
+    //mixin PreBoundSession 
+    val sfw = new SessionFactoryWrapper(sessionFactory) with PreBoundSession
+    //will be run in pre-bound session
+    sfw.withTransaction() { session => ... }
+```
+
 #TODO
 
-* support pre-bound session and provide a consistent api with new created session
 * add scala implict conversion to extends SessionFactory and Session
 

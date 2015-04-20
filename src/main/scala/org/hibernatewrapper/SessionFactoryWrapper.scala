@@ -1,12 +1,13 @@
 package org.hibernatewrapper
 
+import org.hibernate.context.internal.ThreadLocalSessionContext
 import org.hibernate.{Session, SessionFactory}
 import org.slf4j.LoggerFactory
 
 /**
  * A scala wrapper for hibernate session factory built on top of loan pattern and higher order functions
  */
-class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
+class SessionFactoryWrapper(val sessionFactory: SessionFactory) extends NewCreatedSession {
 
   type ExceptionClass = Class[_ <: Throwable]
 
@@ -155,25 +156,6 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) {
    * it is recommended to use withTransaction which executes in a transaction
    */
   def withSession[T](f: Session => T) : T = useSession(f)
-
-  private def useSession[T](f: Session => T) : T = {
-    val session = sessionFactory.openSession()
-    try {
-      f(session)
-    } finally {
-      session.close()
-    }
-  }
-
-  //TODO add in next version
-  /*
-  def bindSession(session: Session) =  ThreadLocalSessionContext.bind(session)
-
-  def unbindSession() =  {
-    val session = ThreadLocalSessionContext.unbind(sessionFactory)
-    if (session != null) session.close()
-  }
-  */
 
 }
 

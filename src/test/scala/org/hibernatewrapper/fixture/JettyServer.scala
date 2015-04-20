@@ -2,6 +2,7 @@ package org.hibernatewrapper.fixture
 
 import org.eclipse.jetty.server.{Server, ServerConnector}
 import org.eclipse.jetty.servlet.{FilterHolder, FilterMapping, ServletHandler}
+import org.hibernatewrapper.servlet.OpenSessionInViewFilter
 import org.hibernatewrapper.servlet.controller.UserController
 
 /**
@@ -15,7 +16,7 @@ object JettyServer {
 
   def start : Unit = {
     val handler = new ServletHandler
-//    handler.addFilterWithMapping(new FilterHolder(new OpenSessionInViewFilter(sf)), "/*", FilterMapping.ALL)
+    handler.addFilterWithMapping(new FilterHolder(new OpenSessionInViewFilter(sf)), "/*", FilterMapping.ALL)
     handler.addServletWithMapping(classOf[UserController], "/users/*")
 
     server.setHandler(handler)
