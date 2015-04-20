@@ -105,7 +105,7 @@ and reuse transaction attributes with partially applied function:
 
 Pre-bound session, aka `Open Session in View Pattern` is a pattern that binds a Hibernate Session to the thread of the request to allow for lazy loading in web views.
 
-to add pre-bound session support, you first need to add `OpenSessionInViewFilter`to your servlet deployment descriptor, take jetty as example:
+to add pre-bound session support, you first need to add `OpenSessionInViewFilter` to your servlet deployment descriptor, take jetty as example:
 
 ```scala
     import org.hibernatewrapper.{PreBoundSession, SessionFactoryWrapper}
