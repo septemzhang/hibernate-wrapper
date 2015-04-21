@@ -88,6 +88,7 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) extends NewCreat
     } catch {
       case e: Throwable =>
         if (shouldCommitOn(e, commitOn)) {
+          //TODO log
           logger.info("commit for exception: {}", e.getMessage)
           commitTransaction(session)
         }else {
@@ -158,10 +159,5 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) extends NewCreat
 
 }
 
-//object SessionFactoryWrapper {
-//
-//  implicit def sfWrapper(sf: SessionFactory) : SessionFactoryWrapper = new SessionFactoryWrapper(sf)
-//
-//}
 
 

@@ -1,19 +1,19 @@
 package org.hibernatewrapper.servlet
 
+import org.hibernatewrapper.PreBoundSession._
+import org.hibernatewrapper.{SessionWrapper, PreBoundSession, SessionFactoryWrapper}
+import org.hibernatewrapper.SessionWrapper._
 import org.hibernatewrapper.fixture.SessionFactoryHolder
 import org.hibernatewrapper.servlet.model.{Task, User}
-import org.hibernatewrapper.{PreBoundSession, SessionFactoryWrapper}
-import org.hibernatewrapper.SessionWrapper._
 import org.scalatest.FunSpec
 
 class UserPreBoundSessionITSpec extends FunSpec {
 
-  val sessionFactory = SessionFactoryHolder.sessionFactory
-  val sfw = new SessionFactoryWrapper(sessionFactory) with PreBoundSession
+  val sf = SessionFactoryHolder.sessionFactory
 
   describe("User") {
     it("should load tasks lazily in the pre-bound session") {
-      val (user, session) = sfw.withTransaction(){ implicit session =>
+      val (user, session) = sf.withTransaction(){ implicit session =>
         val user = createUser("lazy_load")
         User.register(user)
         val task = createTask
@@ -27,6 +27,21 @@ class UserPreBoundSessionITSpec extends FunSpec {
       assert(session.contains(user))
       //lazy load tasks
       assert(user.getTasks.size() === 1)
+
+
+      val sessionFactory = sf
+      val sfw = new SessionFactoryWrapper(sessionFactory) with PreBoundSession
+
+      sfw.withTransaction() { session =>
+        SessionWrapper(session).getById[User](1L)
+      }
+
+      import org.hibernatewrapper.PreBoundSession._
+
+      sessionFactory.withTransaction() { session =>
+        session.getById[User](1L)
+      }
+
     }
   }
 

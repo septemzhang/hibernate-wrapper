@@ -1,6 +1,6 @@
 package org.hibernatewrapper
 
-import org.hibernate.Session
+import org.hibernate.{SessionFactory, Session}
 
 trait PreBoundSession extends ManagedSession {
 
@@ -34,5 +34,8 @@ object PreBoundSession {
   private val threadLocal = new ThreadLocal[Option[Session]] {
     override def initialValue() = None
   }
+
+  implicit def sfWrapper(sf: SessionFactory) : SessionFactoryWrapper with PreBoundSession  =
+    new SessionFactoryWrapper(sf) with PreBoundSession
 
 }

@@ -9,7 +9,7 @@ import scala.beans.BeanProperty
 class Task {
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @BeanProperty var id: java.lang.Long = _
+  @BeanProperty var id: Long = _
 
   @BeanProperty var name: String = _
   @BeanProperty var status: String = _

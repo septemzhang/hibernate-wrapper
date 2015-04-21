@@ -1,6 +1,6 @@
 package org.hibernatewrapper
 
-import org.hibernate.Session
+import org.hibernate.{SessionFactory, Session}
 
 trait NewCreatedSession extends ManagedSession {
 
@@ -15,5 +15,11 @@ trait NewCreatedSession extends ManagedSession {
    */
 //  override abstract def close(session: Session): Unit = session.close()
   override def close(session: Session): Unit = session.close()
+
+}
+
+object NewCreatedSession {
+
+  implicit def sfWrapper(sf: SessionFactory) : SessionFactoryWrapper = new SessionFactoryWrapper(sf)
 
 }

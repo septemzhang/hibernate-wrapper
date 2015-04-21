@@ -132,19 +132,26 @@ and then mixin `PreBoundSession` for SessionFactoryWrapper:
 
 #implicit conversions
 
-hibernate-wrapper comes with a implicit conversion which makes hibernate `Session` more pleasant to use
+hibernate-wrapper comes with some implicit conversions to make `Session` and `SessionFactoryWrapper` more pleasant to use
 
 so
 
 ```scala
-    SessionWrapper(session).getById[User](id)
+    val sfw = new SessionFactoryWrapper(sessionFactory) with PreBoundSession
+
+    sfw.withTransaction() { session =>
+        SessionWrapper(session).getById[User](1L)
+    }
 ```
 
 can be replaced with:
 
 ```scala
-    import org.hibernatewrapper.SessionWrapper._
+      import org.hibernatewrapper.PreBoundSession._
+      import org.hibernatewrapper.SessionWrapper._
 
-    session.getById[User](id)
+      sessionFactory.withTransaction() { session =>
+        session.getById[User](1L)
+      }
 ```
 

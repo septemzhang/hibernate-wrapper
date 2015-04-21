@@ -3,27 +3,28 @@ package org.hibernatewrapper.servlet.controller
 import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
 
 import org.eclipse.jetty.http.HttpStatus
-import org.hibernatewrapper.{PreBoundSession, SessionFactoryWrapper}
+import org.hibernatewrapper.PreBoundSession._
 import org.hibernatewrapper.fixture.SessionFactoryHolder
 import org.hibernatewrapper.servlet.model.{Task, User}
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration._
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 class UserController extends HttpServlet {
 
-  val sfw = new SessionFactoryWrapper(SessionFactoryHolder.sessionFactory) with PreBoundSession
+  val sf = SessionFactoryHolder.sessionFactory
 
   override def doGet(req: HttpServletRequest, resp: HttpServletResponse): Unit = {
 
-    val preBoundSession = sfw.withTransaction() { session => session }
-    sfw.withTransaction() { session =>
+    val preBoundSession = sf.withTransaction() { session => session }
+    sf.withTransaction() { session =>
       //always use the same session in the current thread
       assert(session eq preBoundSession)
     }
 
     val f = Future {
-      sfw.withTransaction() { session => session }
+      sf.withTransaction() { session => session }
     }
 
     for (session <- f) {
@@ -34,7 +35,7 @@ class UserController extends HttpServlet {
     Await.ready(f, 1.seconds)
 
     val id = registerUser.getId
-    val user = sfw.withTransaction() { implicit session =>
+    val user = sf.withTransaction() { implicit session =>
       User.get(id)
     }
 
@@ -44,7 +45,7 @@ class UserController extends HttpServlet {
   }
 
   private def registerUser: User = {
-    sfw.withSession { implicit session =>
+    sf.withSession { implicit session =>
       val user = newUserWithTask
       User.register(user)
       user
