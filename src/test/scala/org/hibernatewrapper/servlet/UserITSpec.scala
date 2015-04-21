@@ -12,7 +12,7 @@ class UserITSpec extends FunSpec {
 
   describe("User") {
     it("should generate primary key after registration") {
-      val user = createUser("primary key")
+      val user = User("primary key")
       assert(user.id === 0 )
       sf.rollback { implicit session =>
         User.register(user)
@@ -22,9 +22,9 @@ class UserITSpec extends FunSpec {
 
     it("should load tasks for user in the same session") {
       sf.rollback { implicit session =>
-        val user = createUser("load_user_and_task")
+        val user = User("load_user_and_task")
         User.register(user)
-        val task = createTask
+        val task = Task("new task")
         User.saveTask(user, task)
         session.flush()
         session.clear()
@@ -40,7 +40,7 @@ class UserITSpec extends FunSpec {
     it("should rollback any change in rollback transaction") {
       val name = "rollback_" + System.currentTimeMillis();
       val user = sf.rollback { implicit session =>
-        val user = createUser(name)
+        val user = User(name)
         User.register(user)
         user
       }
@@ -56,8 +56,7 @@ class UserITSpec extends FunSpec {
 
     it("dirty check of session can not cover operations executed by query") {
       val user = sf.withTransaction() { implicit session =>
-        val user = new User
-        user.setName("dirty_check_" + System.currentTimeMillis())
+        val user = User("dirty_check_" + System.currentTimeMillis())
         User.register(user)
         user
       }
@@ -69,18 +68,6 @@ class UserITSpec extends FunSpec {
       }
     }
 
-  }
-
-  private def createUser(name: String) : User = {
-    val user = new User
-    user.setName(name)
-    user
-  }
-
-  private def createTask : Task = {
-    val task = new Task
-    task.setName("test_task")
-    task
   }
 
 }

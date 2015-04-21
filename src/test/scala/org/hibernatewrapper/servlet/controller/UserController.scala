@@ -52,16 +52,9 @@ class UserController extends HttpServlet {
     }
   }
 
-  private def newUser = {
-    val user = new User
-    user.setName("user_name")
-    user
-  }
-
   private def newUserWithTask = {
-    val task = new Task
-    task.setName("test_task")
-    val user = newUser
+    val task = Task("test_task")
+    val user = User("user_name")
     user.addTask(task)
     user
   }

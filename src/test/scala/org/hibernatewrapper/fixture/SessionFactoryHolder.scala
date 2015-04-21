@@ -5,7 +5,6 @@ import javax.sql.DataSource
 
 import org.h2.jdbcx.JdbcConnectionPool
 import org.hibernate.cfg.AvailableSettings._
-import org.hibernate.cfg.ImprovedNamingStrategy
 import org.hibernate.dialect.H2Dialect
 import org.hibernatewrapper.servlet.model.{Task, User}
 

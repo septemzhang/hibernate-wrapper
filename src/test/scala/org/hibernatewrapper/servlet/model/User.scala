@@ -53,4 +53,10 @@ object User {
     session.findUnique[Long]("select count(id) from Task where user.id = ?", id)
   }
 
+  def apply(name: String) = {
+    val user = new User
+    user.name = name
+    user
+  }
+
 }
