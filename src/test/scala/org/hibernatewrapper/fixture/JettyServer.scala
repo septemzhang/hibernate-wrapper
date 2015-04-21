@@ -12,7 +12,7 @@ object JettyServer {
 
   //set a random port
   private val server = new Server(0)
-  private val sf = SessionFactoryHolder.sessionFactory
+  private val sf = SessionFactoryBuilder.sessionFactory
 
   def start : Unit = {
     val handler = new ServletHandler

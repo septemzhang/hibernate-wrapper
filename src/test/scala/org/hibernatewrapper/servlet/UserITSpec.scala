@@ -2,13 +2,13 @@ package org.hibernatewrapper.servlet
 
 import org.hibernatewrapper.NewCreatedSession._
 import org.hibernatewrapper.SessionWrapper._
-import org.hibernatewrapper.fixture.SessionFactoryHolder
+import org.hibernatewrapper.fixture.SessionFactoryBuilder
 import org.hibernatewrapper.servlet.model.{Task, User}
 import org.scalatest.FunSpec
 
 class UserITSpec extends FunSpec {
 
-  val sf = SessionFactoryHolder.sessionFactory
+  val sf = SessionFactoryBuilder.sessionFactory
 
   describe("User") {
     it("should generate primary key after registration") {

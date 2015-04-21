@@ -2,13 +2,13 @@ package org.hibernatewrapper.servlet
 
 import org.hibernatewrapper.PreBoundSession._
 import org.hibernatewrapper.SessionWrapper._
-import org.hibernatewrapper.fixture.SessionFactoryHolder
+import org.hibernatewrapper.fixture.SessionFactoryBuilder
 import org.hibernatewrapper.servlet.model.{Task, User}
 import org.scalatest.FunSpec
 
 class UserPreBoundSessionITSpec extends FunSpec {
 
-  val sf = SessionFactoryHolder.sessionFactory
+  val sf = SessionFactoryBuilder.sessionFactory
 
   describe("User") {
     it("should load tasks lazily in the pre-bound session") {

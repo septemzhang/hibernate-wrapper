@@ -4,7 +4,7 @@ import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
 
 import org.eclipse.jetty.http.HttpStatus
 import org.hibernatewrapper.PreBoundSession._
-import org.hibernatewrapper.fixture.SessionFactoryHolder
+import org.hibernatewrapper.fixture.SessionFactoryBuilder
 import org.hibernatewrapper.servlet.model.{Task, User}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -13,7 +13,7 @@ import scala.concurrent.{Await, Future}
 
 class UserController extends HttpServlet {
 
-  val sf = SessionFactoryHolder.sessionFactory
+  val sf = SessionFactoryBuilder.sessionFactory
 
   override def doGet(req: HttpServletRequest, resp: HttpServletResponse): Unit = {
 

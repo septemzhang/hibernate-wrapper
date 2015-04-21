@@ -3,12 +3,15 @@ package org.hibernatewrapper.fixture
 import java.util.Properties
 import javax.sql.DataSource
 
+import org.h2.jdbcx.JdbcConnectionPool
 import org.hibernate.SessionFactory
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder
 import org.hibernate.cfg.AvailableSettings._
-import org.hibernate.cfg.{Configuration, NamingStrategy}
+import org.hibernate.cfg.Configuration
 import org.hibernate.context.internal.ThreadLocalSessionContext
+import org.hibernate.dialect.H2Dialect
 import org.hibernate.usertype.UserType
+import org.hibernatewrapper.servlet.model.{Task, User}
 
 object SessionFactoryBuilder {
 
@@ -56,6 +59,25 @@ object SessionFactoryBuilder {
     config.buildSessionFactory(
       new StandardServiceRegistryBuilder().applySettings(config.getProperties).build
     )
+  }
+
+  //singleton of SessionFactory
+  lazy val sessionFactory =
+    SessionFactoryBuilder.dataSource(newDataSource).props(newProps)
+      .dialect(classOf[H2Dialect])
+       //      .namingStrategy(ImprovedNamingStrategy.INSTANCE)
+      .annotatedClasses(classOf[User], classOf[Task])
+      .build()
+
+  private def newProps = {
+    val p = new Properties()
+    p.put(HBM2DDL_AUTO, "update")
+    //p.put(SHOW_SQL, "true")
+    p
+  }
+
+  private def newDataSource = {
+    JdbcConnectionPool.create("jdbc:h2:mem:demo;DB_CLOSE_DELAY=-1", "sa", "")
   }
 
 }
