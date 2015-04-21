@@ -54,7 +54,7 @@ or you can implement all the database operations in a Rich Domain Model style:
         User
       }
 
-      def countTask(id: java.lang.Long)(implicit session: Session) : Long = {
+      def countTask(id: Long)(implicit session: Session) : Long = {
         SessionWrapper(session).findUnique[Long]("select count(id) from Task where user.id = ?", id)
       }
 

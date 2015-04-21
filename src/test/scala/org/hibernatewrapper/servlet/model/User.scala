@@ -13,8 +13,7 @@ import scala.beans.BeanProperty
 class User {
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-  //scala Long?
-  @BeanProperty var id: java.lang.Long = _
+  @BeanProperty var id: Long = _
 
   @BeanProperty var name: String = _
 
@@ -41,7 +40,7 @@ object User {
     session.findUnique(hql, name)
   }
 
-  def get(id: java.lang.Long)(implicit session: Session) : User = session.getById[User](id)
+  def get(id: Long)(implicit session: Session) : User = session.getById[User](id)
 
   def saveTask(user: User, task: Task)(implicit session: Session) : User.type = {
     val u = get(user.getId)
@@ -50,7 +49,7 @@ object User {
     User
   }
 
-  def countTask(id: java.lang.Long)(implicit session: Session) : Long = {
+  def countTask(id: Long)(implicit session: Session) : Long = {
     session.findUnique[Long]("select count(id) from Task where user.id = ?", id)
   }
 

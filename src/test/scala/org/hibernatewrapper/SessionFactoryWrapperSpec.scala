@@ -121,9 +121,10 @@ class SessionFactoryWrapperSpec extends FunSpec {
 
     describe("getById") {
       it("should get entity from session") {
+        val id: scala.Long = 1L
         val f = fixture
-        f.session.getById[Object](1L)
-        verify(f.session).get(classOf[Object], 1L)
+        f.session.getById[Object](id)
+        verify(f.session).get(classOf[Object], id)
       }
     }
 

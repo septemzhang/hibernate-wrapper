@@ -9,7 +9,6 @@ import org.hibernate.{Query, Session}
  */
 class SessionWrapper(val session: Session) {
 
-  //TODO make type of id a type parameter
   /*
   Error:(126, 19) overloaded method value get with alternatives:
   (x$1: String,x$2: java.io.Serializable,x$3: org.hibernate.LockOptions)Object <and>
@@ -24,12 +23,13 @@ class SessionWrapper(val session: Session) {
    */
 //  def get[T](id: java.lang.Long)(implicit m: Manifest[T]) : T = session.get(m.runtimeClass, id).asInstanceOf[T]
 //  def getById[T: Manifest[T]](id: java.lang.Long) : T = session.get(manifest[T].runtimeClass, id).asInstanceOf[T]
-  def getById[T: Manifest](id: java.lang.Long) : T = session.get(manifest[T].runtimeClass, id).asInstanceOf[T]
+//  def getById[T: Manifest](id: java.lang.Long) : T = session.get(manifest[T].runtimeClass, id).asInstanceOf[T]
+  def getById[T: Manifest](id: java.io.Serializable) : T = session.get(manifest[T].runtimeClass, id).asInstanceOf[T]
 
   /**
    * load entity with given id
    */
-  def loadById[T: Manifest](id: java.lang.Long) : T = session.load(manifest[T].runtimeClass, id).asInstanceOf[T]
+  def loadById[T: Manifest](id: java.io.Serializable) : T = session.load(manifest[T].runtimeClass, id).asInstanceOf[T]
 
   /**
    * find with hql and parameters

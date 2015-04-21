@@ -14,11 +14,11 @@ class UserITSpec extends FunSpec {
   describe("User") {
     it("should generate primary key after registration") {
       val user = createUser("primary key")
-      assert(user.getId == null)
+      assert(user.id === 0 )
       sfw.rollback { implicit session =>
         User.register(user)
       }
-      assert(user.getId > 0)
+      assert(user.id !== 0)
     }
 
     it("should load tasks for user in the same session") {
@@ -38,23 +38,6 @@ class UserITSpec extends FunSpec {
       }
     }
 
-    //TODO
-    /*
-    it("should load tasks lazily in the pre-bound session") {
-      val newUser: User = sfw.withTransaction{ implicit session =>
-        val user = createUser("lazy_load")
-        User.register(user)
-        val task = createTask
-        User.saveTask(user, task)
-        session.flush()
-        session.clear()
-        User.findByName(user.getName)
-      }
-      //lazy load tasks
-      assert(newUser.getTasks.size() === 1)
-    }
-    */
-
     it("should rollback any change in rollback transaction") {
       val name = "rollback_" + System.currentTimeMillis();
       val user = sfw.rollback { implicit session =>
@@ -63,7 +46,7 @@ class UserITSpec extends FunSpec {
         user
       }
 
-      assert(user.getId != null)
+      assert(user.getId !== 0)
 
       val count = sfw.withSession { session =>
         session.findUnique[Long]("select count(*) from User where name = ?", name)
