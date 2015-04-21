@@ -130,7 +130,21 @@ and then mixin `PreBoundSession` for SessionFactoryWrapper:
     sfw.withTransaction() { session => ... }
 ```
 
-#TODO
+#implicit conversions
 
-* add scala implict conversion to extends SessionFactory and Session
+hibernate-wrapper comes with a implicit conversion which makes hibernate `Session` more pleasant to use
+
+so
+
+```scala
+    SessionWrapper(session).getById[User](id)
+```
+
+can be replaced with:
+
+```scala
+    import org.hibernatewrapper.SessionWrapper._
+
+    session.getById[User](id)
+```
 

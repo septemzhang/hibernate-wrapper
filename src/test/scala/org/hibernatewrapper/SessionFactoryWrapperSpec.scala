@@ -3,6 +3,7 @@ package org.hibernatewrapper
 import org.hibernate._
 import org.mockito.Mockito._
 import org.scalatest.FunSpec
+import org.hibernatewrapper.SessionWrapper._
 
 class SessionFactoryWrapperSpec extends FunSpec {
 
@@ -100,7 +101,7 @@ class SessionFactoryWrapperSpec extends FunSpec {
         val query = mock(classOf[Query])
 
         when(f.session.createQuery(hql)).thenReturn(query)
-        SessionWrapper(f.session).find(hql, "v1", "v2")
+        f.session.find(hql, "v1", "v2")
         verify(query).setParameter(0, "v1")
         verify(query).setParameter(1, "v2")
         verify(query).list
@@ -113,16 +114,24 @@ class SessionFactoryWrapperSpec extends FunSpec {
         val hql = "hql"
         val query = mock(classOf[Query])
         when(f.session.createQuery(hql)).thenReturn(query)
-        SessionWrapper(f.session).findUnique(hql)
+        f.session.findUnique(hql)
         verify(query).uniqueResult
       }
     }
 
-    describe("get") {
+    describe("getById") {
       it("should get entity from session") {
         val f = fixture
-        SessionWrapper(f.session).get[Object](1L)
+        f.session.getById[Object](1L)
         verify(f.session).get(classOf[Object], 1L)
+      }
+    }
+
+    describe("loadById") {
+      it("should load entity from session") {
+        val f = fixture
+        f.session.loadById[Object](1L)
+        verify(f.session).load(classOf[Object], 1L)
       }
     }
 

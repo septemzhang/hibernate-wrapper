@@ -1,6 +1,5 @@
 package org.hibernatewrapper
 
-import org.hibernate.context.internal.ThreadLocalSessionContext
 import org.hibernate.{Session, SessionFactory}
 import org.slf4j.LoggerFactory
 
@@ -158,5 +157,11 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) extends NewCreat
   def withSession[T](f: Session => T) : T = useSession(f)
 
 }
+
+//object SessionFactoryWrapper {
+//
+//  implicit def sfWrapper(sf: SessionFactory) : SessionFactoryWrapper = new SessionFactoryWrapper(sf)
+//
+//}
 
 

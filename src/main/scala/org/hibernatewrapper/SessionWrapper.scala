@@ -10,16 +10,31 @@ import org.hibernate.{Query, Session}
 class SessionWrapper(val session: Session) {
 
   //TODO make type of id a type parameter
-  def get[T](id: java.lang.Long)(implicit m: Manifest[T]) : T = session.get(m.runtimeClass, id).asInstanceOf[T]
+  /*
+  Error:(126, 19) overloaded method value get with alternatives:
+  (x$1: String,x$2: java.io.Serializable,x$3: org.hibernate.LockOptions)Object <and>
+  (x$1: String,x$2: java.io.Serializable,x$3: org.hibernate.LockMode)Object <and>
+  (x$1: String,x$2: java.io.Serializable)Object <and>
+  (x$1: Class[_],x$2: java.io.Serializable,x$3: org.hibernate.LockOptions)Object <and>
+  (x$1: Class[_],x$2: java.io.Serializable,x$3: org.hibernate.LockMode)Object <and>
+  (x$1: Class[_],x$2: java.io.Serializable)Object
+ does not take type parameters
+        f.session.get[Object](1L)
+                  ^
+   */
+//  def get[T](id: java.lang.Long)(implicit m: Manifest[T]) : T = session.get(m.runtimeClass, id).asInstanceOf[T]
+//  def getById[T: Manifest[T]](id: java.lang.Long) : T = session.get(manifest[T].runtimeClass, id).asInstanceOf[T]
+  def getById[T: Manifest](id: java.lang.Long) : T = session.get(manifest[T].runtimeClass, id).asInstanceOf[T]
 
   /**
    * load entity with given id
    */
-  def load[T](id: java.lang.Long)(implicit m: Manifest[T]) : T = session.load(m.runtimeClass, id).asInstanceOf[T]
+  def loadById[T: Manifest](id: java.lang.Long) : T = session.load(manifest[T].runtimeClass, id).asInstanceOf[T]
 
   /**
    * find with hql and parameters
    */
+  //TODO return collection type of scala
   def find[T](hql: String, params: Any*): List[T] = {
     createQuery(hql, params: _*).list().asInstanceOf[List[T]]
   }
@@ -45,5 +60,7 @@ class SessionWrapper(val session: Session) {
 object SessionWrapper {
 
   def apply(session: Session) = new SessionWrapper(session)
+
+  implicit def sessionToSessoinWrapper(s: Session) : SessionWrapper = SessionWrapper(s)
 
 }

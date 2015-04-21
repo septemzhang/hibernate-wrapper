@@ -5,7 +5,7 @@ import java.util.{ArrayList, List}
 import javax.persistence._
 
 import org.hibernate.Session
-import org.hibernatewrapper.SessionWrapper
+import org.hibernatewrapper.SessionWrapper._
 
 import scala.beans.BeanProperty
 
@@ -38,10 +38,10 @@ object User {
 
   def findByName(name: String)(implicit session: Session) : User = {
     val hql = "from User where name = ?"
-    SessionWrapper(session).findUnique(hql, name)
+    session.findUnique(hql, name)
   }
 
-  def get(id: java.lang.Long)(implicit session: Session) : User = SessionWrapper(session).get[User](id)
+  def get(id: java.lang.Long)(implicit session: Session) : User = session.getById[User](id)
 
   def saveTask(user: User, task: Task)(implicit session: Session) : User.type = {
     val u = get(user.getId)
@@ -51,7 +51,7 @@ object User {
   }
 
   def countTask(id: java.lang.Long)(implicit session: Session) : Long = {
-    SessionWrapper(session).findUnique[Long]("select count(id) from Task where user.id = ?", id)
+    session.findUnique[Long]("select count(id) from Task where user.id = ?", id)
   }
 
 }

@@ -1,6 +1,7 @@
 package org.hibernatewrapper.servlet
 
-import org.hibernatewrapper.{SessionWrapper, SessionFactoryWrapper}
+import org.hibernatewrapper.SessionFactoryWrapper
+import org.hibernatewrapper.SessionWrapper._
 import org.hibernatewrapper.fixture.SessionFactoryHolder
 import org.hibernatewrapper.servlet.model.{Task, User}
 import org.scalatest.FunSpec
@@ -65,7 +66,7 @@ class UserITSpec extends FunSpec {
       assert(user.getId != null)
 
       val count = sfw.withSession { session =>
-        SessionWrapper(session).findUnique[Long]("select count(*) from User where name = ?", name)
+        session.findUnique[Long]("select count(*) from User where name = ?", name)
       }
 
       assert(count === 0)

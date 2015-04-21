@@ -2,7 +2,8 @@ package org.hibernatewrapper.servlet
 
 import org.hibernatewrapper.fixture.SessionFactoryHolder
 import org.hibernatewrapper.servlet.model.{Task, User}
-import org.hibernatewrapper.{SessionWrapper, PreBoundSession, SessionFactoryWrapper}
+import org.hibernatewrapper.{PreBoundSession, SessionFactoryWrapper}
+import org.hibernatewrapper.SessionWrapper._
 import org.scalatest.FunSpec
 
 class UserPreBoundSessionITSpec extends FunSpec {
@@ -19,7 +20,7 @@ class UserPreBoundSessionITSpec extends FunSpec {
         User.saveTask(user, task)
         session.flush()
         session.clear()
-        (SessionWrapper(session).load[User](user.getId), session)
+        (session.loadById[User](user.getId), session)
       }
 
       assert(session.isOpen)
