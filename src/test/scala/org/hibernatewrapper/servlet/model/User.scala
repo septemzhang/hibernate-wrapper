@@ -17,6 +17,7 @@ class User {
 
   @BeanProperty var name: String = _
 
+  //TODO support scala collection types and Option
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = Array(CascadeType.ALL))
   @BeanProperty var tasks: List[Task] = new ArrayList[Task]
 

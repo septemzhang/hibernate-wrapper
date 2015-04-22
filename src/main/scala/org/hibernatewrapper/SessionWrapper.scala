@@ -3,11 +3,14 @@ package org.hibernatewrapper
 import java.util.List
 
 import org.hibernate.{Query, Session}
+import org.slf4j.LoggerFactory
 
 /**
  * some convenient functions to load/query entities from session
  */
 class SessionWrapper(val session: Session) {
+
+  private val logger = LoggerFactory.getLogger(classOf[SessionWrapper])
 
   /*
   Error:(126, 19) overloaded method value get with alternatives:
@@ -35,6 +38,8 @@ class SessionWrapper(val session: Session) {
    * find with hql and parameters
    */
   //TODO return collection type of scala
+  // find(hql).params(...).list()
+  // find(hql).params(...).unique()
   def find[T](hql: String, params: Any*): List[T] = {
     createQuery(hql, params: _*).list().asInstanceOf[List[T]]
   }
@@ -46,8 +51,12 @@ class SessionWrapper(val session: Session) {
     createQuery(hql, params: _*).uniqueResult().asInstanceOf[T]
   }
 
+  //WARN  org.hibernate.hql.internal.ast.HqlSqlWalker - [DEPRECATION] Encountered positional parameter near line 1, column 75.
+  //Positional parameter are considered deprecated; use named parameters or JPA-style positional parameters instead.
   private def createQuery(queryString: String, values: Any*): Query = {
     require(queryString != null && !queryString.isEmpty, "queryString cannot be empty")
+//    logger.debug("create query: {}, params: {}", queryString, values: _*)
+//    logger.debug("create query: {}, params: {}", queryString, values)
     val query: Query = session.createQuery(queryString)
     values.zipWithIndex.foreach {
       case (v, i) => query.setParameter(i, v)

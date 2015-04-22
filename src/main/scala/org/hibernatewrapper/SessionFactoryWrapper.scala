@@ -81,17 +81,19 @@ class SessionFactoryWrapper(val sessionFactory: SessionFactory) extends NewCreat
     try {
       val transaction = session.getTransaction
       transaction.setTimeout(timeout)
+      logger.debug("begin transaction, timeout: {}, commit on: {}", timeout, commitOn)
       transaction.begin()
       val result = f(session)
+      logger.debug("commit transaction")
       commitTransaction(session)
       result
     } catch {
       case e: Throwable =>
         if (shouldCommitOn(e, commitOn)) {
-          //TODO log
-          logger.info("commit for exception: {}", e.getMessage)
+          logger.debug("commit on exception: {}", e.getClass.getSimpleName)
           commitTransaction(session)
         }else {
+          logger.debug("rollback on exception: {}", e.getClass.getSimpleName)
           rollbackTransaction(session)
         }
         throw e

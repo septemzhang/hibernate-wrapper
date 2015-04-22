@@ -1,8 +1,11 @@
 package org.hibernatewrapper
 
 import org.hibernate.{SessionFactory, Session}
+import org.slf4j.LoggerFactory
 
 trait PreBoundSession extends ManagedSession {
+
+  private val logger = LoggerFactory.getLogger(classOf[PreBoundSession])
 
   override abstract def create(): Session = {
     PreBoundSession.threadLocal.get() match {
@@ -17,11 +20,13 @@ trait PreBoundSession extends ManagedSession {
   }
 
   def bindSession(session: Session) : Session = {
+    logger.debug("bind session")
     PreBoundSession.threadLocal.set(Some(session))
     session
   }
 
   def unbindSession() =  {
+    logger.debug("unbind session")
     val session = PreBoundSession.threadLocal.get()
     session.foreach { s => s.close() }
     PreBoundSession.threadLocal.set(None)
